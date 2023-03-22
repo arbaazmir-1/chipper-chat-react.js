@@ -46,7 +46,7 @@ function HomePage() {
     <div className="w-full h-screen ">
       <Navbar />
       <div className="rest-container w-full flex justify-between items-center ">
-        <div className="w-1/4 h-full bg-blue-50 rounded-2xl md:flex flex-col items-center friend-list overflow-scroll hidden">
+        <div className="w-1/4 h-full shadow-md rounded-2xl md:flex flex-col items-center friend-list overflow-scroll hidden">
           <div className="w-full h-full flex flex-col  items-center">
             <h1 className="text-2xl font-mono my-5">Friends</h1>
             {friends?.map((friend) => {

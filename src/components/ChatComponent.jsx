@@ -82,20 +82,19 @@ function ChatComponent({ chatId }) {
     
 
   return (
-    <div className="w-full md:w-3/4 h-full rounded-2xl flex flex-col justify-center current-chat overflow-y-scroll">
+    <div className="w-full md:w-3/4 h-full rounded-2xl flex flex-col justify-center current-chat overflow-y-scroll shadow-md mx-2">
       <div className="w-3/6 h-1/12 flex justify-between items-center p-4 ">
         <div className="w-1/4 h-full flex justify-center items-center">
           <img src={otherUser?.photo} alt="" className="w-10 h-10 rounded-full" />
         </div>
         <div className="w-3/4 h-full flex flex-col justify-center items-start">
           <h1 className="text-lg font-mono">{otherUser?.name}</h1>
-          
-        </div>
+         </div>
       </div>
       <div className="w-full h-full overflow-y-auto px-4">
         {/* chat messages */}
         {message?.map((msg) => {
-          const time = new Date(msg.timestamp).toUTCString();
+          const time = new Date(msg?.timestamp).toUTCString();
           //convert to am pm
           const hours = time.slice(-12, -10);
           const minutes = time.slice(-9, -7);
@@ -133,23 +132,23 @@ function ChatComponent({ chatId }) {
             
 
           return (
-            <div key={msg.timestamp} className="w-h-fit-content flex flex-col justify-center items-center">
+            <div key={msg?.timestamp} className="w-h-fit-content flex flex-col justify-center items-center">
               <div className="w-3/4 h-fit-content flex flex-col justify-center items-center">
                 
                 <div className={`w-full h-fit my-2 flex justify-end ${
-                    msg.user === auth?.currentUser?.email ? 'flex-row' : 'flex-row-reverse'
+                    msg?.user === auth?.currentUser?.email ? 'flex-row' : 'flex-row-reverse'
 
                 }`}>
                 <div
                   className={`w-fit h-fit-content  rounded-2xl p-2 ${
-                    msg.user === auth?.currentUser?.email ? 'bg-blue-500 text-white ' : 'bg-gray-200 self-end '
+                    msg?.user === auth?.currentUser?.email ? 'bg-green-500 text-white ' : 'bg-gray-200 self-end '
                     }`}
                 >
-                    <p className="text-sm font-mono">{msg.message}</p>
+                    <p className="text-sm font-mono">{msg?.message}</p>
 
                 
                     <p className={`text-xs font-mono ${
-                        msg.user === auth?.currentUser?.email ? 'text-gray-200' : 'text-gray-500'
+                        msg?.user === auth?.currentUser?.email ? 'text-gray-200' : 'text-gray-500'
                     } `}>
                     {/* {msg.user === auth?.currentUser?.email ? 'You' : otherUser?.name}{' '} */}
                     {" "}
@@ -163,17 +162,17 @@ function ChatComponent({ chatId }) {
         })}
         <div ref={messagesEndRef} />
         </div>
-        <div className="w-full h-1/12 flex justify-between items-center p-4 ">
-            <div className="w-3/4 h-full flex justify-center items-center">
+        <div className="w-full h-1/12 flex justify-center items-center p-2 ">
+            <div className="w-4/5 h-full flex justify-center items-center">
                 <input
                     type="text"
-                    className="w-full h-full rounded-2xl p-2"
+                    className="w-full h-full rounded-2xl p-4 border-2 border-gray-200"
                     placeholder="Type a message"
                     value={sendMessage}
                     onChange={(e) => setSendMessage(e.target.value)}
                 />
             </div>
-            <div className="w-1/4 h-full flex justify-center items-center">
+            <div className="w-1/5 h-full flex justify-center items-center">
                 <button
                     className="w-1/2 h-full rounded-2xl bg-blue-500 text-white"
                     onClick={sendMessageToDb}

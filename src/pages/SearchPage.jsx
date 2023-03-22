@@ -35,50 +35,50 @@ function SearchPage() {
   }, [searchParams]);
 
   const addFriend =async () => {
-     addDoc(collection(db, "chats"), {
-        users: [
-            {
-                email: auth.currentUser.email,
-                name: auth.currentUser.displayName,
-                photo: auth.currentUser.photoURL,
-            },
-            {
-                email: searchParams.get("q"),
-                name: users[0].name,
+    //  addDoc(collection(db, "chats"), {
+    //     users: [
+    //         {
+    //             email: auth.currentUser.email,
+    //             name: auth.currentUser.displayName,
+    //             photo: auth.currentUser.photoURL,
+    //         },
+    //         {
+    //             email: searchParams.get("q"),
+    //             name: users[0].name,
 
-                photo: users[0].photo,
+    //             photo: users[0].photo,
 
-            }
-        ],
-        messages: [],
-    }, { merge: true })
-    .then(async(docRef) => {
-        console.log("Document written with ID: ", docRef.id);
+    //         }
+    //     ],
+    //     messages: [],
+    // }, { merge: true })
+    // .then(async(docRef) => {
+    //     console.log("Document written with ID: ", docRef.id);
         
         const addedfriend = await updateDoc(doc(db, "users", searchParams.get("q")), {
-            friends:  arrayUnion( {
+            friendsRequest:  arrayUnion( {
                 email: auth.currentUser.email,
                 name: auth.currentUser.displayName,
                 photo: auth.currentUser.photoURL,
-                chatId: docRef.id
+                
             })
                
             
         })
     
         const addedfriend2 = await updateDoc(doc(db, "users", auth.currentUser.email), {
-            friends: arrayUnion({
+            friendsRequestSent: arrayUnion({
                 email: searchParams.get("q"),
                 name: users[0].name,
                 photo: users[0].photo,
-                chatId: docRef.id
+                
     
             } )
         })
-    })
-    .catch((error) => {
-        console.error("Error adding document: ", error);
-    });
+    // })
+    // .catch((error) => {
+    //     console.error("Error adding document: ", error);
+    // });
 
 
 
@@ -112,6 +112,7 @@ function SearchPage() {
                     </div>
             )
         })}
+        {users.length === 0 && !loading && <h1 className="text-2xl font-mono m-10">No Users Found</h1>}
         {loading && <h1 className="text-2xl font-mono">Loading...</h1>}
 
       </div>
