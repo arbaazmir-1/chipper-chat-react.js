@@ -72,6 +72,8 @@ function Navbar() {
   ];
 
   useEffect(() => {
+
+    if(auth.currentUser!== undefined && auth.currentUser!== null){
     const unsub = onSnapshot(
       doc(db, "users", auth?.currentUser?.email),
       (doc) => {
@@ -80,7 +82,10 @@ function Navbar() {
       }
     );
     return unsub;
-  }, []);
+    }
+  }, [
+    auth?.currentUser,
+  ]);
 
   return (
     <div className="w-full h-20 shadow-sm flex flex-row justify-between items-center">

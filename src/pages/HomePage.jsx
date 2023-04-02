@@ -15,6 +15,7 @@ function HomePage() {
   const navigate = useNavigate();
 
   useEffect(() => {
+    if(auth?.currentUser !== null && auth?.currentUser !== undefined){
     const unsub = onSnapshot(doc(db, "users", auth?.currentUser?.email), (doc) => {
       setFriends(doc.data().friends);
      console.log(doc.data().friends)
@@ -24,7 +25,10 @@ function HomePage() {
       
   });
     return unsub;
-  }, []);
+}
+  }, [
+    auth?.currentUser,
+  ]);
 
   useEffect(() => {
     auth.onAuthStateChanged((user) => {
