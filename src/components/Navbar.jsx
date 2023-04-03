@@ -71,21 +71,39 @@ function Navbar() {
     },
   ];
 
-  useEffect(() => {
-
-    if(auth.currentUser!== undefined && auth.currentUser!== null){
-    const unsub = onSnapshot(
-      doc(db, "users", auth?.currentUser?.email),
-      (doc) => {
-        setFriendRequest(doc.data().friendsRequest);
-        console.log(doc.data().friendsRequest);
+  useEffect(()=>{
+    const unsub =auth.onAuthStateChanged((user)=>{
+      if(user){
+        const unsub = onSnapshot(doc(db,"users",user.email),(doc)=>{
+          setFriendRequest(doc.data().friendsRequest);
+        })
+        return unsub;
       }
-    );
+      else {
+        setFriendRequest([]);
+      }
+
+    })
     return unsub;
-    }
-  }, [
-    auth?.currentUser,
-  ]);
+  })
+
+  // useEffect(() => {
+    
+
+
+  //   if(auth.currentUser!== undefined && auth.currentUser!== null){
+  //   const unsub = onSnapshot(
+  //     doc(db, "users", auth?.currentUser?.email),
+  //     (doc) => {
+  //       setFriendRequest(doc.data().friendsRequest);
+  //       console.log(doc.data().friendsRequest);
+  //     }
+  //   );
+  //   return unsub;
+  //   }
+  // }, [
+  //   auth?.currentUser,
+  // ]);
 
   return (
     <div className="w-full h-20 shadow-sm flex flex-row justify-between items-center">
@@ -148,73 +166,69 @@ function Navbar() {
                         <p className="mt-1 text-gray-600 m-1">{item.name}</p>
                       </div>
                       <div className="flex items-center justify-end gap-x-2">
-                        <button
-                          className="text-sm font-medium text-gray-500 hover:text-gray-900"
-                          onClick={() => {
-                            addDoc(
-                              collection(db, "chats"),
-                              {
-                                users: [
-                                  {
-                                    email: auth.currentUser.email,
-                                    name: auth.currentUser.displayName,
-                                    photo: auth.currentUser.photoURL,
-                                  },
-                                  {
-                                    email: item.email,
-                                    name: item.name,
+                      <button
+  className="text-sm font-medium text-gray-500 hover:text-gray-900"
+  onClick={() => {
+    addDoc(
+      collection(db, "chats"),
+      {
+        users: [
+          {
+            email: auth.currentUser.email,
+            name: auth.currentUser.displayName,
+            photo: auth.currentUser.photoURL,
+          },
+          {
+            email: item.email,
+            name: item.name,
+            photo: item.photo,
+          },
+        ],
+        messages: [],
+      },
+      { merge: true }
+    )
+      .then(async (docRef) => {
+        console.log("Document written with ID: ", docRef.id);
 
-                                    photo: item.photo,
-                                  },
-                                ],
-                                messages: [],
-                              },
-                              { merge: true }
-                            )
-                              .then(async (docRef) => {
-                                console.log(
-                                  "Document written with ID: ",
-                                  docRef.id
-                                );
+        const docRef1 = doc(db, "users", auth?.currentUser?.email);
+        updateDoc(docRef1, {
+          friends: arrayUnion({
+            name: item.name,
+            email: item.email,
+            photo: item.photo,
+            chatId: docRef.id,
+          }),
+          friendsRequest: arrayRemove(item),
+        });
+        
+        const docRef2 = doc(db, "users", item.email);
+        console.log(docRef2);
+        const removeRequest = {
+          
+          email: auth?.currentUser?.email,
+          name: auth?.currentUser?.displayName,
+          photo: auth?.currentUser?.photoURL,
+        };
+        console.log(removeRequest);
+        updateDoc(docRef2, {
+          friends: arrayUnion({
+            name: auth?.currentUser?.displayName,
+            email: auth?.currentUser?.email,
+            photo: auth?.currentUser?.photoURL,
+            chatId: docRef.id,
+          }),
+          friendsRequestSent: arrayRemove(removeRequest),
+        });
+      })
+      .catch((error) => {
+        console.error("Error adding document: ", error);
+      });
+  }}
+>
+  Accept
+</button>
 
-                                const docRef1 = doc(
-                                  db,
-                                  "users",
-                                  auth?.currentUser?.email
-                                );
-                                updateDoc(docRef1, {
-                                  friends: arrayUnion({
-                                    name: item.name,
-                                    email: item.email,
-                                    photo: item.photo,
-                                    chatId: docRef.id,
-                                  }),
-                                  friendsRequest: arrayRemove(item),
-                                });
-                                const docRef2 = doc(db, "users", item.email);
-                                const removeRequest = {
-                                  name: auth?.currentUser?.displayName,
-                                  email: auth?.currentUser?.email,
-                                  photo: auth?.currentUser?.photoURL,
-  };
-                                updateDoc(docRef2, {
-                                  friends: arrayUnion({
-                                    name: auth?.currentUser?.displayName,
-                                    email: auth?.currentUser?.email,
-                                    photo: auth?.currentUser?.photoURL,
-                                    chatId: docRef.id,
-                                  }),
-                                  
-                                  friendRequestSent: arrayRemove(removeRequest),
-                                });
-                              })
-                              .catch((error) => {
-                                console.error("Error adding document: ", error);
-                              });
-                          }}
-                        >
-                          Accept
-                        </button>
                         <button
                           className="text-sm font-medium text-gray-500 hover:text-gray-900"
                           onClick={() => {

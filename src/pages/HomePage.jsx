@@ -13,22 +13,31 @@ function HomePage() {
   const [chatId, setChatId] = useState("");
   const [reset , setReset] = useState(false);
   const navigate = useNavigate();
+  const [loading , setLoading] = useState(false);
+  const [error , setError] = useState(false);
 
   useEffect(() => {
-    if(auth?.currentUser !== null && auth?.currentUser !== undefined){
-    const unsub = onSnapshot(doc(db, "users", auth?.currentUser?.email), (doc) => {
-      setFriends(doc.data().friends);
-     console.log(doc.data().friends)
+    const unsub = auth.onAuthStateChanged((user) => {
+      if (user) {
+        setLoading(true);
+        const docRef = doc(db, "users", user.email);
+        const unsub = onSnapshot(docRef, (doc) => {
+          setFriends(doc.data()?.friends ?? []);
+          setLoading(false);
+          console.log(doc.data()?.friends);
+        });
 
-      
+        return unsub;
+        
+      } else {
+        setLoading(false);
+        setFriends([]);
 
-      
-  });
+      }
+    });
+
     return unsub;
-}
-  }, [
-    auth?.currentUser,
-  ]);
+  }, []);
 
   useEffect(() => {
     auth.onAuthStateChanged((user) => {
@@ -77,6 +86,17 @@ function HomePage() {
                 </div>
               );
             })}
+            {loading && (
+              <div className="w-full h-full flex justify-center items-center">
+                <i className="fa fa-spinner fa-spin text-3xl"></i>
+                <p>Loading</p>
+              </div>
+            )}
+            {error && (
+              <div className="w-full h-full flex justify-center items-center">
+                <p>Something went wrong</p>
+                </div>
+            )}
           </div>
         </div>
         
