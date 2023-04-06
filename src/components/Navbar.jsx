@@ -58,16 +58,22 @@ function Navbar() {
       description: "Logout of your account",
 
       icon: UserIcon,
-      onClick: () => {
-        auth
-          .signOut()
-          .then(() => {
-            navigate("/login");
-          })
-          .catch((error) => {
-            alert(error.message);
-          });
-      },
+      onClick: (event) => {
+        event.preventDefault();
+        // ask for confirmation
+        const confirmed = window.confirm("Are you sure you want to logout?");
+        if (confirmed) {
+          auth
+            .signOut()
+            .then(() => {
+              navigate("/login");
+            })
+            .catch((error) => {
+              alert(error.message);
+            });
+        }
+      }
+      
     },
   ];
 
